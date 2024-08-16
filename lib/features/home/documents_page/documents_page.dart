@@ -96,13 +96,13 @@ class _DocumentsPageState extends State<DocumentsPage> {
         String fileName = '${_selectedImageName!}.jpg';
         var storageRef = FirebaseStorage.instance
             .ref()
-            .child('users/${_user!.uid}/$fileName');
+            .child('Users/${_user!.uid}/$fileName');
         var uploadTask = storageRef.putFile(_imageFile!);
         await uploadTask.whenComplete(() => null);
         String downloadURL = await storageRef.getDownloadURL();
 
         await FirebaseFirestore.instance
-            .collection('users')
+            .collection('Users')
             .doc(_user!.uid)
             .collection('documents')
             .doc(_selectedImageName!)
@@ -138,7 +138,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
 
     try {
       var docRef = FirebaseFirestore.instance
-          .collection('users')
+          .collection('Users')
           .doc(_user!.uid)
           .collection('documents')
           .doc(imageName);
@@ -185,7 +185,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
             SizedBox(height: 20),
             StreamBuilder(
               stream: FirebaseFirestore.instance
-                  .collection('users')
+                  .collection('Users')
                   .doc(_user?.uid)
                   .collection('documents')
                   .snapshots(),

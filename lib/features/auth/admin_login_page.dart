@@ -35,12 +35,13 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
           .collection('Users')
           .doc(userCredential.user?.uid)
           .get();
+      // print("User Document: ${userDoc.data()}");
 
       if (userDoc.exists) {
         // Cast the document data to a Map<String, dynamic>
-        Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+        // Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
 
-        if (userData['isAdmin'] == true) {
+        if (userDoc['isAdmin'] == "true") {
           // Navigate to the admin dashboard
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(

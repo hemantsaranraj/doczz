@@ -62,7 +62,7 @@ class HomePage extends StatelessWidget {
           ),
           body: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
-                .collection('users')
+                .collection('Users')
                 .doc(FirebaseAuth.instance.currentUser?.uid)
                 .collection('documents')
                 .snapshots(),
