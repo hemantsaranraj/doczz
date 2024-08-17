@@ -3,35 +3,52 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
-  Future<String> _getUsername() async {
+  Future<Map<String, String>> _getUserDetails() async {
     final User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       try {
         // Retrieve the user document using the user's UID
         DocumentSnapshot userDoc = await FirebaseFirestore.instance
-            .collection('Users') // Ensure this matches your collection name
-            .doc(user
-                .uid) // Use UID instead of email if UID is used as document ID
+            .collection('Users')
+            .doc(user.uid)
             .get();
 
         if (userDoc.exists) {
-          // Return the username field from the document
-          return userDoc.get('username') as String;
+          // Return the vehicle type and number from the document
+          String vehicleType = userDoc.get('vehicleType') as String;
+          String vehicleNumber = userDoc.get('vehicleNumber') as String;
+          return {
+            'username': userDoc.get('username') as String,
+            'vehicleType': vehicleType,
+            'vehicleNumber': vehicleNumber,
+          };
         } else {
-          return 'User'; // Default username if document does not exist
+          return {
+            'username': 'User',
+            'vehicleType': 'Unknown',
+            'vehicleNumber': 'Unknown',
+          };
         }
       } catch (e) {
-        print('Error fetching username: $e');
-        return 'User'; // Default username in case of an error
+        print('Error fetching user details: $e');
+        return {
+          'username': 'User',
+          'vehicleType': 'Unknown',
+          'vehicleNumber': 'Unknown',
+        };
       }
     }
-    return 'User'; // Default username if user is null
+    return {
+      'username': 'User',
+      'vehicleType': 'Unknown',
+      'vehicleNumber': 'Unknown',
+    };
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String>(
-      future: _getUsername(),
+    return FutureBuilder<Map<String, String>>(
+      future: _getUserDetails(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
@@ -53,89 +70,116 @@ class HomePage extends StatelessWidget {
           );
         }
 
-        final username = snapshot.data ?? 'User';
+        final userDetails = snapshot.data ??
+            {
+              'username': 'User',
+              'vehicleType': 'Unknown',
+              'vehicleNumber': 'Unknown',
+            };
 
         return Scaffold(
           appBar: AppBar(
-            title: Text('Hi, $username'),
+            title: Text('Hi, ${userDetails['username']}'),
             backgroundColor: Theme.of(context).primaryColor,
           ),
-          body: StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection('Users')
-                .doc(FirebaseAuth.instance.currentUser?.uid)
-                .collection('documents')
-                .snapshots(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
-              }
-
-              if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              }
-
-              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                return Center(child: Text('No images found.'));
-              }
-
-              final documents = snapshot.data!.docs;
-
-              return GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 10.0,
-                  mainAxisSpacing: 10.0,
-                  childAspectRatio: 1.0,
+          body: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'Vehicle Type: ${userDetails['vehicleType']}',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                itemCount: documents.length,
-                itemBuilder: (context, index) {
-                  final imageUrl = documents[index]['imageUrl'];
-                  final imageName = documents[index].id;
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'Vehicle Number: ${userDetails['vehicleNumber']}',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Expanded(
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('Users')
+                      .doc(FirebaseAuth.instance.currentUser?.uid)
+                      .collection('documents')
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
 
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              FullScreenImage(imageUrl: imageUrl),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(8.0),
+                    if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    }
+
+                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                      return Center(child: Text('No images found.'));
+                    }
+
+                    final documents = snapshot.data!.docs;
+
+                    return GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 10.0,
+                        mainAxisSpacing: 10.0,
+                        childAspectRatio: 1.0,
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: Image.network(
-                              imageUrl,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Center(
-                                    child: Text('Failed to load image.'));
-                              },
+                      itemCount: documents.length,
+                      itemBuilder: (context, index) {
+                        final imageUrl = documents[index]['imageUrl'];
+                        final imageName = documents[index].id;
+
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    FullScreenImage(imageUrl: imageUrl),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: Image.network(
+                                    imageUrl,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Center(
+                                          child: Text('Failed to load image.'));
+                                    },
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    imageName,
+                                    textAlign: TextAlign.center,
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              imageName,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              );
-            },
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         );
       },
@@ -152,7 +196,7 @@ class FullScreenImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Image View'),
+        title: Text('Document View'),
         backgroundColor: Theme.of(context).primaryColor,
       ),
       body: Center(
