@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -17,12 +16,47 @@ class _DocumentsPageState extends State<DocumentsPage> {
   User? _user;
   bool _isUploading = false;
   String? _selectedImageName;
-  // String? _imageToDelete;
+
+  TextEditingController _vehicleNumberController = TextEditingController();
+  String? _selectedVehicleType;
+  bool _isEditingVehicleInfo = true;
 
   @override
   void initState() {
     super.initState();
     _user = FirebaseAuth.instance.currentUser;
+    _loadVehicleInfo(); // Load existing vehicle info on init
+  }
+
+  Future<void> _loadVehicleInfo() async {
+    if (_user == null) return;
+
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(_user!.uid)
+          .get();
+
+      if (userDoc.exists) {
+        setState(() {
+          _vehicleNumberController.text =
+              userDoc['vehicleNumber'] ?? ''; // Load vehicle number
+          _selectedVehicleType =
+              userDoc['vehicleType'] ?? null; // Load vehicle type
+
+          if (_vehicleNumberController.text.isNotEmpty &&
+              _selectedVehicleType != null) {
+            _isEditingVehicleInfo =
+                false; // Set editing to false if data exists
+          }
+        });
+      }
+    } catch (e) {
+      print('Load Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading vehicle info: $e')),
+      );
+    }
   }
 
   Future<void> _showImageSelector() async {
@@ -35,15 +69,15 @@ class _DocumentsPageState extends State<DocumentsPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Text('image_1'),
+                title: Text('Driving Licence'),
                 onTap: () {
-                  Navigator.of(context).pop('image_1');
+                  Navigator.of(context).pop('Driving Licence');
                 },
               ),
               ListTile(
-                title: Text('image_2'),
+                title: Text('Registration Certificate'),
                 onTap: () {
-                  Navigator.of(context).pop('image_2');
+                  Navigator.of(context).pop('Registration Certificate');
                 },
               ),
             ],
@@ -57,6 +91,41 @@ class _DocumentsPageState extends State<DocumentsPage> {
         _selectedImageName = selectedImageName;
       });
       _getImage();
+    }
+  }
+
+  Future<void> _deleteImage(String imageName) async {
+    _user = FirebaseAuth.instance.currentUser;
+    if (_user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('User is not authenticated')),
+      );
+      return;
+    }
+
+    try {
+      // Delete the image from Firebase Storage
+      var storageRef = FirebaseStorage.instance
+          .ref()
+          .child('Users/${_user!.uid}/$imageName.jpg');
+      await storageRef.delete();
+
+      // Delete the image document from Firestore
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(_user!.uid)
+          .collection('documents')
+          .doc(imageName)
+          .delete();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$imageName deleted successfully')),
+      );
+    } catch (e) {
+      print('Delete Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
     }
   }
 
@@ -133,37 +202,47 @@ class _DocumentsPageState extends State<DocumentsPage> {
     }
   }
 
-  Future<void> _deleteImage(String imageName) async {
-    if (_user == null) return;
+  Future<void> _saveVehicleInfo() async {
+    _user = FirebaseAuth.instance.currentUser;
+    if (_user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('User is not authenticated')),
+      );
+      return;
+    }
+
+    if (_vehicleNumberController.text.isEmpty || _selectedVehicleType == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please enter vehicle number and select type')),
+      );
+      return;
+    }
 
     try {
-      var docRef = FirebaseFirestore.instance
-          .collection('Users')
-          .doc(_user!.uid)
-          .collection('documents')
-          .doc(imageName);
+      await FirebaseFirestore.instance.collection('Users').doc(_user!.uid).set({
+        'vehicleNumber': _vehicleNumberController.text,
+        'vehicleType': _selectedVehicleType,
+      }, SetOptions(merge: true));
 
-      DocumentSnapshot doc = await docRef.get();
-      if (doc.exists) {
-        String? imageUrl = doc['imageUrl'];
+      setState(() {
+        _isEditingVehicleInfo = false;
+      });
 
-        if (imageUrl != null) {
-          var storageRef = FirebaseStorage.instance.refFromURL(imageUrl);
-          await storageRef.delete();
-        }
-
-        await docRef.delete();
-        setState(() {});
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Image deleted successfully')),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Vehicle information saved successfully')),
+      );
     } catch (e) {
-      print('Delete Error: $e');
+      print('Save Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
     }
+  }
+
+  void _editVehicleInfo() {
+    setState(() {
+      _isEditingVehicleInfo = true;
+    });
   }
 
   @override
@@ -178,6 +257,46 @@ class _DocumentsPageState extends State<DocumentsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            if (_isEditingVehicleInfo) ...[
+              TextField(
+                controller: _vehicleNumberController,
+                decoration: InputDecoration(labelText: 'Vehicle Number'),
+              ),
+              DropdownButtonFormField<String>(
+                value: _selectedVehicleType,
+                items: ['Bike', 'Car', 'Truck', 'Van', 'Bus']
+                    .map((type) => DropdownMenuItem(
+                          child: Text(type),
+                          value: type,
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedVehicleType = value;
+                  });
+                },
+                decoration: InputDecoration(labelText: 'Vehicle Type'),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _saveVehicleInfo,
+                child: Text('Done'),
+              ),
+            ] else ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Vehicle Number: ${_vehicleNumberController.text}\nVehicle Type: $_selectedVehicleType',
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.edit),
+                    onPressed: _editVehicleInfo,
+                  ),
+                ],
+              ),
+            ],
+            SizedBox(height: 20),
             ElevatedButton(
               onPressed: _showImageSelector,
               child: Text('Pick Image'),
@@ -202,17 +321,17 @@ class _DocumentsPageState extends State<DocumentsPage> {
                       Column(
                         children: [
                           Container(
-                            padding: EdgeInsets.all(8.0),
+                            padding: EdgeInsets.all(8),
                             decoration: BoxDecoration(
                               border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(8.0),
+                              borderRadius: BorderRadius.circular(10),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(doc.id),
                                 IconButton(
-                                  icon: Icon(Icons.delete, color: Colors.red),
+                                  icon: Icon(Icons.delete),
                                   onPressed: () => _deleteImage(doc.id),
                                 ),
                               ],
@@ -225,34 +344,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                 );
               },
             ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _uploadImage,
-              child: _isUploading
-                  ? CircularProgressIndicator(
-                      color: Colors.white,
-                    )
-                  : Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.upload_file, color: Colors.white),
-                        SizedBox(width: 10),
-                        Text('Upload Image'),
-                      ],
-                    ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor,
-              ),
-            ),
-            if (!_isUploading && _imageFile != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 20.0),
-                child: Icon(
-                  Icons.check_circle,
-                  color: Colors.green,
-                  size: 40,
-                ),
-              ),
+            if (_isUploading) CircularProgressIndicator(),
           ],
         ),
       ),

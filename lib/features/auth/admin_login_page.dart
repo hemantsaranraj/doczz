@@ -33,7 +33,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
       // Check if the user is an admin
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
           .collection('Users')
-          .doc(userCredential.user?.uid)
+          .doc(userCredential.user?.email)
           .get();
       // print("User Document: ${userDoc.data()}");
 
