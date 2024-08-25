@@ -33,7 +33,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Select Image'),
+          title: Text('Select Document'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -49,6 +49,18 @@ class _DocumentsPageState extends State<DocumentsPage> {
                   Navigator.of(context).pop('Registration Certificate');
                 },
               ),
+              ListTile(
+                title: Text('Insurance'),
+                onTap: () {
+                  Navigator.of(context).pop('Insurance');
+                },
+              ),
+              ListTile(
+                title: Text('Pollution Certificate'),
+                onTap: () {
+                  Navigator.of(context).pop('Pollution Certificate');
+                },
+              ),
             ],
           ),
         );
@@ -61,6 +73,54 @@ class _DocumentsPageState extends State<DocumentsPage> {
       });
       _getImage();
     }
+  }
+
+  Future<void> _showUploadDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // User must tap a button to dismiss
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Upload'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (_imageFile != null) ...[
+                Icon(
+                  Icons.check_circle,
+                  color: Colors.green,
+                  size: 80,
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'Do you want to upload this document?',
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                _uploadImage(); // Trigger the upload
+              },
+              child: _isUploading
+                  ? CircularProgressIndicator(
+                      color: Colors.white,
+                    )
+                  : Text('Upload Document'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> _deleteImage(String imageName) async {
@@ -106,6 +166,8 @@ class _DocumentsPageState extends State<DocumentsPage> {
       setState(() {
         _imageFile = File(pickedFile.path);
       });
+      // Show the upload confirmation dialog
+      _showUploadDialog();
     }
   }
 
@@ -147,7 +209,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
             .set({'imageUrl': downloadURL});
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Image uploaded and URL saved successfully')),
+          SnackBar(content: Text('Document uploaded successfully')),
         );
 
         setState(() {
@@ -223,125 +285,132 @@ class _DocumentsPageState extends State<DocumentsPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            if (_isEditingVehicleInfo) ...[
-              TextField(
-                controller: _vehicleNumberController,
-                decoration: InputDecoration(labelText: 'Vehicle Number'),
-              ),
-              DropdownButtonFormField<String>(
-                value: _selectedVehicleType,
-                items: ['Bike', 'Car', 'Truck', 'Van', 'Bus']
-                    .map((type) => DropdownMenuItem(
-                          child: Text(type),
-                          value: type,
-                        ))
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedVehicleType = value;
-                  });
-                },
-                decoration: InputDecoration(labelText: 'Vehicle Type'),
-              ),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              if (_isEditingVehicleInfo) ...[
+                Container(
+                  width: double.infinity,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      TextField(
+                        controller: _vehicleNumberController,
+                        decoration: InputDecoration(
+                          labelText: 'Vehicle Number',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 16),
+                      DropdownButtonFormField<String>(
+                        value: _selectedVehicleType,
+                        items: ['Bike', 'Car', 'Truck', 'Van', 'Bus']
+                            .map((type) => DropdownMenuItem(
+                                  child: Text(type),
+                                  value: type,
+                                ))
+                            .toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedVehicleType = value;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Vehicle Type',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        isExpanded: true,
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: _saveVehicleInfo,
+                        child: Text('Done'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).primaryColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ] else ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Vehicle Number: ${_vehicleNumberController.text}\nVehicle Type: $_selectedVehicleType',
+                      textAlign: TextAlign.center,
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.edit),
+                      onPressed: _editVehicleInfo,
+                    ),
+                  ],
+                ),
+              ],
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _saveVehicleInfo,
-                child: Text('Done'),
+                onPressed: _showImageSelector,
+                child: Text('Pick Document'),
               ),
-            ] else ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Vehicle Number: ${_vehicleNumberController.text}\nVehicle Type: $_selectedVehicleType',
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.edit),
-                    onPressed: _editVehicleInfo,
-                  ),
-                ],
+              SizedBox(height: 20),
+              StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection('Users')
+                    .doc(_user?.uid)
+                    .collection('documents')
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+
+                  var documents = snapshot.data!.docs;
+
+                  return Column(
+                    children: [
+                      for (var doc in documents)
+                        Column(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(8.0),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(doc.id),
+                                  IconButton(
+                                    icon: Icon(Icons.delete, color: Colors.red),
+                                    onPressed: () => _deleteImage(doc.id),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                          ],
+                        ),
+                    ],
+                  );
+                },
               ),
             ],
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _showImageSelector,
-              child: Text('Pick Image'),
-            ),
-            SizedBox(height: 20),
-            StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection('Users')
-                  .doc(_user?.uid)
-                  .collection('documents')
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return Center(child: CircularProgressIndicator());
-                }
-
-                var documents = snapshot.data!.docs;
-
-                return Column(
-                  children: [
-                    for (var doc in documents)
-                      Column(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(8.0),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(doc.id),
-                                IconButton(
-                                  icon: Icon(Icons.delete, color: Colors.red),
-                                  onPressed: () => _deleteImage(doc.id),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                        ],
-                      ),
-                  ],
-                );
-              },
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _uploadImage,
-              child: _isUploading
-                  ? CircularProgressIndicator(
-                      color: Colors.white,
-                    )
-                  : Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.upload_file, color: Colors.white),
-                        SizedBox(width: 10),
-                        Text('Upload Image'),
-                      ],
-                    ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor,
-              ),
-            ),
-            if (!_isUploading && _imageFile != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 20.0),
-                child: Icon(
-                  Icons.check_circle,
-                  color: Colors.green,
-                  size: 40,
-                ),
-              ),
-          ],
+          ),
         ),
       ),
     );
