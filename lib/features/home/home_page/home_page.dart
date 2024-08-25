@@ -116,7 +116,7 @@ class HomePage extends StatelessWidget {
                     }
 
                     if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                      return Center(child: Text('No images found.'));
+                      return Center(child: Text('No Documents uploaded.'));
                     }
 
                     final documents = snapshot.data!.docs;

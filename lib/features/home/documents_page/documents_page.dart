@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -25,38 +26,6 @@ class _DocumentsPageState extends State<DocumentsPage> {
   void initState() {
     super.initState();
     _user = FirebaseAuth.instance.currentUser;
-    _loadVehicleInfo(); // Load existing vehicle info on init
-  }
-
-  Future<void> _loadVehicleInfo() async {
-    if (_user == null) return;
-
-    try {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('Users')
-          .doc(_user!.uid)
-          .get();
-
-      if (userDoc.exists) {
-        setState(() {
-          _vehicleNumberController.text =
-              userDoc['vehicleNumber'] ?? ''; // Load vehicle number
-          _selectedVehicleType =
-              userDoc['vehicleType'] ?? null; // Load vehicle type
-
-          if (_vehicleNumberController.text.isNotEmpty &&
-              _selectedVehicleType != null) {
-            _isEditingVehicleInfo =
-                false; // Set editing to false if data exists
-          }
-        });
-      }
-    } catch (e) {
-      print('Load Error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error loading vehicle info: $e')),
-      );
-    }
   }
 
   Future<void> _showImageSelector() async {
@@ -321,17 +290,17 @@ class _DocumentsPageState extends State<DocumentsPage> {
                       Column(
                         children: [
                           Container(
-                            padding: EdgeInsets.all(8),
+                            padding: EdgeInsets.all(8.0),
                             decoration: BoxDecoration(
                               border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(8.0),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(doc.id),
                                 IconButton(
-                                  icon: Icon(Icons.delete),
+                                  icon: Icon(Icons.delete, color: Colors.red),
                                   onPressed: () => _deleteImage(doc.id),
                                 ),
                               ],
@@ -344,7 +313,34 @@ class _DocumentsPageState extends State<DocumentsPage> {
                 );
               },
             ),
-            if (_isUploading) CircularProgressIndicator(),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _uploadImage,
+              child: _isUploading
+                  ? CircularProgressIndicator(
+                      color: Colors.white,
+                    )
+                  : Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.upload_file, color: Colors.white),
+                        SizedBox(width: 10),
+                        Text('Upload Image'),
+                      ],
+                    ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).primaryColor,
+              ),
+            ),
+            if (!_isUploading && _imageFile != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 20.0),
+                child: Icon(
+                  Icons.check_circle,
+                  color: Colors.green,
+                  size: 40,
+                ),
+              ),
           ],
         ),
       ),
