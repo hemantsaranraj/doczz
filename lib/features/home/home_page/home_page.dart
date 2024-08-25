@@ -32,7 +32,7 @@ class HomePage extends StatelessWidget {
       } catch (e) {
         print('Error fetching user details: $e');
         return {
-          'username': 'User',
+          'username': 'New User',
           'vehicleType': 'Unknown',
           'vehicleNumber': 'Unknown',
         };
@@ -83,20 +83,38 @@ class HomePage extends StatelessWidget {
             backgroundColor: Theme.of(context).primaryColor,
           ),
           body: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  'Vehicle Type: ${userDetails['vehicleType']}',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  'Vehicle Number: ${userDetails['vehicleNumber']}',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                padding: const EdgeInsets.symmetric(vertical: 20.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Vehicle Type',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 8.0),
+                    Text(
+                      userDetails['vehicleType'] ?? 'Unknown',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 20.0),
+                    Text(
+                      'Vehicle Number',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 8.0),
+                    Text(
+                      userDetails['vehicleNumber'] ?? 'Unknown',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  ],
                 ),
               ),
               Expanded(
@@ -116,7 +134,17 @@ class HomePage extends StatelessWidget {
                     }
 
                     if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                      return Center(child: Text('No Documents uploaded.'));
+                      return Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                          child: Text(
+                            'Kindly upload your details in the documents page',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      );
                     }
 
                     final documents = snapshot.data!.docs;
