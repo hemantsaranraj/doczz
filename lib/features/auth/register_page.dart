@@ -126,13 +126,16 @@ class _RegisterPageState extends State<RegisterPage> {
               );
             },
             child: Text(
-              'OK',
-              style: theme.textTheme.headlineMedium?.copyWith(
-                color: theme.primaryColor,
+              'Login',
+              style: TextStyle(
+                color: Colors.white, // Set text color to white
+                fontWeight: FontWeight.bold, // Set text to normal weight
               ),
             ),
           ),
         ],
+        backgroundColor: theme
+            .primaryColor, // Set dialog background color to match the theme
       ),
     );
   }

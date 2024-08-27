@@ -136,8 +136,19 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   );
                 },
-                child: Text('Don\'t have an account? Register here',
-                    style: TextStyle(color: textColor)),
+                child: RichText(
+                  text: TextSpan(
+                    text: "Don't have an account? ",
+                    style: TextStyle(color: textColor),
+                    children: <TextSpan>[
+                      TextSpan(
+                        text: 'Register here',
+                        style: TextStyle(
+                            color: textColor, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
               ),
               SizedBox(height: 20), // Add spacing before the admin login button
               TextButton(
@@ -149,7 +160,8 @@ class _LoginPageState extends State<LoginPage> {
                   );
                 },
                 child: Text('Admin Login', // Add the admin login option
-                    style: TextStyle(color: textColor)),
+                    style: TextStyle(
+                        color: textColor, fontWeight: FontWeight.bold)),
               ),
             ],
           ),

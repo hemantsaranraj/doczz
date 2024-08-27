@@ -20,12 +20,45 @@ class _DocumentsPageState extends State<DocumentsPage> {
 
   TextEditingController _vehicleNumberController = TextEditingController();
   String? _selectedVehicleType;
-  bool _isEditingVehicleInfo = true;
+  bool _isEditingVehicleInfo = false; // Changed to false
 
   @override
   void initState() {
     super.initState();
     _user = FirebaseAuth.instance.currentUser;
+    _loadVehicleInfo();
+  }
+
+  Future<void> _loadVehicleInfo() async {
+    if (_user != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(_user!.uid)
+          .get();
+
+      if (userDoc.exists) {
+        String? vehicleNumber = userDoc.get('vehicleNumber') as String?;
+        String? vehicleType = userDoc.get('vehicleType') as String?;
+
+        if (vehicleNumber != null && vehicleType != null) {
+          setState(() {
+            _vehicleNumberController.text = vehicleNumber;
+            _selectedVehicleType = vehicleType;
+            _isEditingVehicleInfo = false; // Show the Edit mode
+          });
+        } else {
+          setState(() {
+            _isEditingVehicleInfo =
+                true; // Show input fields if info is missing
+          });
+        }
+      } else {
+        setState(() {
+          _isEditingVehicleInfo =
+              true; // Show input fields if document doesn't exist
+        });
+      }
+    }
   }
 
   Future<void> _showImageSelector() async {
@@ -256,7 +289,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
       }, SetOptions(merge: true));
 
       setState(() {
-        _isEditingVehicleInfo = false;
+        _isEditingVehicleInfo = false; // Switch to Edit mode after saving
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -330,7 +363,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                       SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: _saveVehicleInfo,
-                        child: Text('Done'),
+                        child: Text('Save'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Theme.of(context).primaryColor,
                           shape: RoundedRectangleBorder(

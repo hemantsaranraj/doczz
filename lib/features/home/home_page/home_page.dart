@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:doczz/features/home/home_page/number_plate_widget.dart'; // Import the custom NumberPlate widget
 
 class HomePage extends StatelessWidget {
   Future<Map<String, String>> _getUserDetails() async {
@@ -91,26 +92,12 @@ class HomePage extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      'Vehicle Type',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 8.0),
-                    Text(
-                      userDetails['vehicleType'] ?? 'Unknown',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    NumberPlate(
+                      vehicleNumber: userDetails['vehicleNumber'] ?? 'Unknown',
                     ),
                     SizedBox(height: 20.0),
                     Text(
-                      'Vehicle Number',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 8.0),
-                    Text(
-                      userDetails['vehicleNumber'] ?? 'Unknown',
+                      'Vehicle type: ${userDetails['vehicleType'] ?? 'Unknown'}',
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),

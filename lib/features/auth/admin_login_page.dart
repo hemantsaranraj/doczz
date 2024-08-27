@@ -57,7 +57,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
       } else {
         // Document does not exist
         FirebaseAuth.instance.signOut();
-        _showErrorDialog("Login Failed", "Permisson Denied");
+        _showErrorDialog("Permisson Denied", "unauthorized access");
       }
     } catch (e) {
       _showErrorDialog("Login Failed", e.toString());

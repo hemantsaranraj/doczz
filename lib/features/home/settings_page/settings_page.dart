@@ -14,6 +14,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   File? _profileImage;
   String? _profileImageUrl;
+  String? _userName;
   User? _user;
 
   @override
@@ -21,6 +22,7 @@ class _SettingsPageState extends State<SettingsPage> {
     super.initState();
     _user = FirebaseAuth.instance.currentUser;
     _fetchProfileImageUrl();
+    _fetchUserName();
   }
 
   Future<void> _fetchProfileImageUrl() async {
@@ -32,15 +34,12 @@ class _SettingsPageState extends State<SettingsPage> {
             .get();
 
         if (userDoc.exists) {
-          // Check if 'profileImageUrl' field exists
           if (userDoc.data() != null &&
               (userDoc.data() as Map<String, dynamic>)
                   .containsKey('profileImageUrl')) {
-            if (mounted) {
-              setState(() {
-                _profileImageUrl = userDoc['profileImageUrl'];
-              });
-            }
+            setState(() {
+              _profileImageUrl = userDoc['profileImageUrl'];
+            });
           } else {
             print('Field "profileImageUrl" does not exist.');
           }
@@ -53,18 +52,42 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  Future<void> _fetchUserName() async {
+    if (_user != null) {
+      try {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('Users')
+            .doc(_user!.uid)
+            .get();
+
+        if (userDoc.exists) {
+          if (userDoc.data() != null &&
+              (userDoc.data() as Map<String, dynamic>).containsKey('name')) {
+            setState(() {
+              _userName = userDoc['username'];
+            });
+          } else {
+            print('Field "name" does not exist.');
+          }
+        } else {
+          print('User document does not exist.');
+        }
+      } catch (e) {
+        print('Error fetching user name: $e');
+      }
+    }
+  }
+
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
       if (mounted) {
-        // Check if widget is still mounted
         setState(() {
           _profileImage = File(pickedFile.path);
         });
 
-        // Upload the selected image to Firebase Storage
         if (_user != null) {
           try {
             final storageRef = FirebaseStorage.instance
@@ -73,7 +96,6 @@ class _SettingsPageState extends State<SettingsPage> {
             await storageRef.putFile(_profileImage!);
             String downloadUrl = await storageRef.getDownloadURL();
 
-            // Update the user's profile image URL in Firestore
             DocumentReference userDocRef =
                 FirebaseFirestore.instance.collection('Users').doc(_user!.uid);
 
@@ -81,7 +103,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 .set({'profileImageUrl': downloadUrl}, SetOptions(merge: true));
 
             if (mounted) {
-              // Check if widget is still mounted
               setState(() {
                 _profileImageUrl = downloadUrl;
               });
@@ -93,7 +114,6 @@ class _SettingsPageState extends State<SettingsPage> {
             }
           } catch (e) {
             if (mounted) {
-              // Check if widget is still mounted
               print('Error uploading profile image: $e');
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('Failed to upload profile picture')),
@@ -124,55 +144,99 @@ class _SettingsPageState extends State<SettingsPage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment
+              .spaceBetween, // Pushes Logout button to the bottom
           children: [
-            Center(
-              child: GestureDetector(
-                onTap: _pickImage,
-                child: Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Colors.grey[300],
-                      backgroundImage: _profileImage != null
-                          ? FileImage(_profileImage!)
-                          : _profileImageUrl != null
-                              ? NetworkImage(_profileImageUrl!)
-                              : null,
-                      child: _profileImage == null && _profileImageUrl == null
-                          ? Icon(
-                              Icons.person,
-                              size: 50,
-                              color: Colors.white,
-                            )
-                          : null,
+            Column(
+              children: [
+                Center(
+                  child: GestureDetector(
+                    onTap: _pickImage,
+                    child: Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundColor: Colors.grey[300],
+                          backgroundImage: _profileImage != null
+                              ? FileImage(_profileImage!)
+                              : _profileImageUrl != null
+                                  ? NetworkImage(_profileImageUrl!)
+                                  : null,
+                          child:
+                              _profileImage == null && _profileImageUrl == null
+                                  ? Icon(
+                                      Icons.person,
+                                      size: 50,
+                                      color: Colors.white,
+                                    )
+                                  : null,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Icon(
+                            Icons.edit,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ),
+                      ],
                     ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Icon(
-                        Icons.edit,
-                        color: Colors.white,
-                        size: 20,
+                  ),
+                ),
+                SizedBox(height: 10),
+                if (_userName != null) ...[
+                  Center(
+                    child: Text(
+                      _userName!,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ],
+                  ),
+                ],
+                SizedBox(height: 30),
+                ListTile(
+                  leading: Icon(Icons.help),
+                  title: Text('Help & Support'),
+                  onTap: () {
+                    // Navigate to Help & Support page
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.group),
+                  title: Text('Refer a Friend'),
+                  onTap: () {
+                    // Implement referral logic or navigate to the referral page
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.contact_mail),
+                  title: Text('Contact Us'),
+                  onTap: () {
+                    // Implement contact logic or navigate to the contact page
+                  },
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20.0),
+              child: Center(
+                child: ElevatedButton(
+                  onPressed: _logout,
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: Text(
+                    'Logout',
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 40),
-            ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('Logout'),
-              onTap: _logout,
-            ),
-            Divider(),
-            ListTile(
-              leading: Icon(Icons.help),
-              title: Text('Help & Support'),
-              onTap: () {
-                // Navigate to Help & Support page
-              },
             ),
           ],
         ),
