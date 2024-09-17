@@ -29,12 +29,16 @@ class _LoginPageState extends State<LoginPage> {
         password: _passwordController.text,
       );
 
+      // If the user is verifed then home page is displayed
+
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) =>
               const WelcomeScreen(), // Ensure WelcomeScreen is a Widget
         ),
       );
+
+      //If not verfication is not approved then the error popup is displayed
     } catch (e) {
       showDialog(
         context: context,
@@ -53,6 +57,8 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
   }
+
+  // Building the UI
 
   @override
   Widget build(BuildContext context) {

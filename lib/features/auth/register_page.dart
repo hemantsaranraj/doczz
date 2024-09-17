@@ -140,6 +140,8 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
+  //Building the UI
+
   @override
   Widget build(BuildContext context) {
     final brightness = Theme.of(context).brightness;

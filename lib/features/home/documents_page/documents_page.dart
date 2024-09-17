@@ -40,22 +40,16 @@ class _DocumentsPageState extends State<DocumentsPage> {
         String? vehicleNumber = userDoc.get('vehicleNumber') as String?;
         String? vehicleType = userDoc.get('vehicleType') as String?;
 
-        if (vehicleNumber != null && vehicleType != null) {
-          setState(() {
-            _vehicleNumberController.text = vehicleNumber;
-            _selectedVehicleType = vehicleType;
-            _isEditingVehicleInfo = false; // Show the Edit mode
-          });
-        } else {
-          setState(() {
-            _isEditingVehicleInfo =
-                true; // Show input fields if info is missing
-          });
-        }
+        setState(() {
+          _vehicleNumberController.text =
+              vehicleNumber ?? 'null'; // Set to "null" if not present
+          _selectedVehicleType =
+              vehicleType ?? 'null'; // Set to "null" if not present
+          _isEditingVehicleInfo = false; // Show the Edit mode
+        });
       } else {
         setState(() {
-          _isEditingVehicleInfo =
-              true; // Show input fields if document doesn't exist
+          _isEditingVehicleInfo = true; // Show input fields if info is missing
         });
       }
     }
@@ -322,6 +316,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
+              // Vehicle Info Editing Section
               if (_isEditingVehicleInfo) ...[
                 Container(
                   width: double.infinity,
@@ -379,11 +374,13 @@ class _DocumentsPageState extends State<DocumentsPage> {
                   ),
                 ),
               ] else ...[
+                // Displaying Vehicle Info Section
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Vehicle Number: ${_vehicleNumberController.text}\nVehicle Type: $_selectedVehicleType',
+                      'Vehicle Number: ${_vehicleNumberController.text.isNotEmpty ? _vehicleNumberController.text : 'null'}\n'
+                      'Vehicle Type: ${_selectedVehicleType ?? 'null'}',
                       textAlign: TextAlign.center,
                     ),
                     IconButton(
@@ -394,11 +391,15 @@ class _DocumentsPageState extends State<DocumentsPage> {
                 ),
               ],
               SizedBox(height: 20),
+
+              // Document Picker Button
               ElevatedButton(
                 onPressed: _showImageSelector,
-                child: Text('Pick Document'),
+                child: Text('Select a Document to upload'),
               ),
               SizedBox(height: 20),
+
+              // Document List Section
               StreamBuilder(
                 stream: FirebaseFirestore.instance
                     .collection('Users')

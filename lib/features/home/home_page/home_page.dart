@@ -95,7 +95,7 @@ class HomePage extends StatelessWidget {
                     NumberPlate(
                       vehicleNumber: userDetails['vehicleNumber'] ?? 'Unknown',
                     ),
-                    SizedBox(height: 20.0),
+                    SizedBox(height: 30.0),
                     Text(
                       'Vehicle type: ${userDetails['vehicleType'] ?? 'Unknown'}',
                       style:
