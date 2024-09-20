@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:doczz/features/home/home_page/home_page.dart'; // Update with your actual path
-import 'package:doczz/features/home/documents_page/documents_page.dart'; // Update with your actual path
-import 'package:doczz/features/home/settings_page/settings_page.dart'; // Update with your actual path
+import 'package:doczz/features/home/home_page/home_page.dart';
+import 'package:doczz/features/home/documents_page/documents_page.dart';
+import 'package:doczz/features/home/settings_page/settings_page.dart';
 
 class WelcomeScreen extends StatefulWidget {
-  const WelcomeScreen({Key? key}) : super(key: key);
+  const WelcomeScreen({super.key});
 
   @override
   _WelcomeScreenState createState() => _WelcomeScreenState();
@@ -14,9 +14,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   int _selectedIndex = 1;
 
   static final List<Widget> _pages = <Widget>[
-    DocumentsPage(),
-    HomePage(),
-    SettingsPage(),
+    const DocumentsPage(),
+    const HomePage(),
+    const SettingsPage(),
   ];
 
   void _onItemTapped(int index) {

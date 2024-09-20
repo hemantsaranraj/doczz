@@ -16,7 +16,7 @@ class AppTheme {
             bodyMedium: AppTextStyles.bodyMedium,
             bodySmall: AppTextStyles.bodySmall,
           ),
-      iconTheme: IconThemeData(color: AppColors.lightTextColor),
+      iconTheme: const IconThemeData(color: AppColors.lightTextColor),
     );
   }
 
@@ -38,7 +38,7 @@ class AppTheme {
             bodySmall: AppTextStyles.bodySmall
                 .copyWith(color: AppColors.darkTextColor),
           ),
-      iconTheme: IconThemeData(color: AppColors.darkTextColor),
+      iconTheme: const IconThemeData(color: AppColors.darkTextColor),
     );
   }
 }

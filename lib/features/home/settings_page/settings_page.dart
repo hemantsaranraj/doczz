@@ -4,9 +4,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:doczz/features/auth/login_page.dart'; // Adjust the path as needed
+import 'package:doczz/features/auth/login_page.dart';
 
 class SettingsPage extends StatefulWidget {
+  const SettingsPage({super.key});
+
   @override
   _SettingsPageState createState() => _SettingsPageState();
 }
@@ -108,7 +110,7 @@ class _SettingsPageState extends State<SettingsPage> {
               });
 
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
+                const SnackBar(
                     content: Text('Profile picture uploaded successfully')),
               );
             }
@@ -116,7 +118,8 @@ class _SettingsPageState extends State<SettingsPage> {
             if (mounted) {
               print('Error uploading profile image: $e');
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Failed to upload profile picture')),
+                const SnackBar(
+                    content: Text('Failed to upload profile picture')),
               );
             }
           }
@@ -129,7 +132,7 @@ class _SettingsPageState extends State<SettingsPage> {
     await FirebaseAuth.instance.signOut();
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (context) => LoginPage(),
+        builder: (context) => const LoginPage(),
       ),
     );
   }
@@ -138,14 +141,13 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings'),
+        title: const Text('Settings'),
         backgroundColor: Theme.of(context).primaryColor,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment
-              .spaceBetween, // Pushes Logout button to the bottom
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Column(
               children: [
@@ -164,14 +166,14 @@ class _SettingsPageState extends State<SettingsPage> {
                                   : null,
                           child:
                               _profileImage == null && _profileImageUrl == null
-                                  ? Icon(
+                                  ? const Icon(
                                       Icons.person,
                                       size: 50,
                                       color: Colors.white,
                                     )
                                   : null,
                         ),
-                        Positioned(
+                        const Positioned(
                           bottom: 0,
                           right: 0,
                           child: Icon(
@@ -184,39 +186,33 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 if (_userName != null) ...[
                   Center(
                     child: Text(
                       _userName!,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ],
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
                 ListTile(
-                  leading: Icon(Icons.help),
-                  title: Text('Help & Support'),
-                  onTap: () {
-                    // Navigate to Help & Support page
-                  },
+                  leading: const Icon(Icons.help),
+                  title: const Text('Help & Support'),
+                  onTap: () {},
                 ),
                 ListTile(
-                  leading: Icon(Icons.group),
-                  title: Text('Refer a Friend'),
-                  onTap: () {
-                    // Implement referral logic or navigate to the referral page
-                  },
+                  leading: const Icon(Icons.group),
+                  title: const Text('Refer a Friend'),
+                  onTap: () {},
                 ),
                 ListTile(
-                  leading: Icon(Icons.contact_mail),
-                  title: Text('Contact Us'),
-                  onTap: () {
-                    // Implement contact logic or navigate to the contact page
-                  },
+                  leading: const Icon(Icons.contact_mail),
+                  title: const Text('Contact Us'),
+                  onTap: () {},
                 ),
               ],
             ),
@@ -226,12 +222,13 @@ class _SettingsPageState extends State<SettingsPage> {
                 child: ElevatedButton(
                   onPressed: _logout,
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 15),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Logout',
                     style: TextStyle(fontSize: 16),
                   ),

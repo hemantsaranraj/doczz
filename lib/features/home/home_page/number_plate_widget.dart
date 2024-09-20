@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 class NumberPlate extends StatelessWidget {
   final String vehicleNumber;
 
-  NumberPlate({required this.vehicleNumber});
+  const NumberPlate({super.key, required this.vehicleNumber});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8.0),
@@ -18,13 +18,13 @@ class NumberPlate extends StatelessWidget {
             color: Colors.grey.withOpacity(0.5),
             spreadRadius: 2,
             blurRadius: 5,
-            offset: Offset(0, 3), // changes position of shadow
+            offset: const Offset(0, 3),
           ),
         ],
       ),
       child: Text(
         vehicleNumber,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 24.0,
           fontWeight: FontWeight.bold,
           letterSpacing: 2.0,

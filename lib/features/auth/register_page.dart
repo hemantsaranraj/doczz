@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:doczz/features/auth/login_page.dart'; // Update with your actual path
+import 'package:doczz/features/auth/login_page.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({Key? key}) : super(key: key);
+  const RegisterPage({super.key});
 
   @override
   _RegisterPageState createState() => _RegisterPageState();
@@ -68,11 +68,8 @@ class _RegisterPageState extends State<RegisterPage> {
     // Using the UID as the document ID
     String uid = userCredential.user!.uid;
 
-    await FirebaseFirestore.instance
-        .collection("Users")
-        .doc(uid) // Store the document with UID as the ID
-        .set({
-      'uid': uid, // Store the UID in the document as well
+    await FirebaseFirestore.instance.collection("Users").doc(uid).set({
+      'uid': uid,
       'email': userCredential.user!.email,
       'username': _usernameController.text.trim(),
     });
@@ -82,7 +79,7 @@ class _RegisterPageState extends State<RegisterPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Icon(
+        title: const Icon(
           Icons.error,
           color: Colors.red,
           size: 60,
@@ -93,7 +90,7 @@ class _RegisterPageState extends State<RegisterPage> {
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: Text('OK'),
+            child: const Text('OK'),
           ),
         ],
       ),
@@ -125,17 +122,16 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               );
             },
-            child: Text(
+            child: const Text(
               'Login',
               style: TextStyle(
-                color: Colors.white, // Set text color to white
-                fontWeight: FontWeight.bold, // Set text to normal weight
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
         ],
-        backgroundColor: theme
-            .primaryColor, // Set dialog background color to match the theme
+        backgroundColor: theme.primaryColor,
       ),
     );
   }
@@ -160,7 +156,7 @@ class _RegisterPageState extends State<RegisterPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  SizedBox(height: 40),
+                  const SizedBox(height: 40),
                   Text(
                     'Register here',
                     style: TextStyle(
@@ -169,7 +165,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       color: textColor,
                     ),
                   ),
-                  SizedBox(height: 80),
+                  const SizedBox(height: 80),
                   Padding(
                     padding: const EdgeInsets.only(bottom: 16.0),
                     child: TextFormField(
@@ -278,13 +274,13 @@ class _RegisterPageState extends State<RegisterPage> {
                       },
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: _register,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
                       elevation: 0,
-                      minimumSize: Size(double.infinity, 48),
+                      minimumSize: const Size(double.infinity, 48),
                     ),
                     child: Text(
                       'Register',
@@ -295,7 +291,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   TextButton(
                     onPressed: () {
                       Navigator.of(context).pushReplacement(

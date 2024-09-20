@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class AdminDashboard extends StatefulWidget {
+  const AdminDashboard({super.key});
+
   @override
   _AdminDashboardState createState() => _AdminDashboardState();
 }
@@ -47,12 +49,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('No user found'),
-          content: Text(
+          title: const Text('No user found'),
+          content: const Text(
               'The username or vehicle number entered does not exist in the database.'),
           actions: [
             TextButton(
-              child: Text('OK'),
+              child: const Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -78,12 +80,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
               decoration: InputDecoration(
                 labelText: 'Enter Username or Vehicle Number',
                 suffixIcon: IconButton(
-                  icon: Icon(Icons.search),
+                  icon: const Icon(Icons.search),
                   onPressed: _searchUser,
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             searchResults != null
                 ? Expanded(
                     child: ListView.builder(
@@ -99,7 +101,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       },
                     ),
                   )
-                : Text('Search for a user to display their documents'),
+                : const Text('Search for a user to display their documents'),
           ],
         ),
       ),
@@ -113,7 +115,8 @@ class UserDocumentsWidget extends StatelessWidget {
   final String vehicleType;
   final String vehicleNumber;
 
-  UserDocumentsWidget({
+  const UserDocumentsWidget({
+    super.key,
     required this.userId,
     required this.username,
     required this.vehicleType,
@@ -127,17 +130,17 @@ class UserDocumentsWidget extends StatelessWidget {
       children: [
         Text(
           'Username: $username',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         Text(
           'Vehicle Type: $vehicleType',
-          style: TextStyle(fontSize: 18),
+          style: const TextStyle(fontSize: 18),
         ),
         Text(
           'Vehicle Number: $vehicleNumber',
-          style: TextStyle(fontSize: 18),
+          style: const TextStyle(fontSize: 18),
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('Users')
@@ -146,7 +149,7 @@ class UserDocumentsWidget extends StatelessWidget {
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             }
 
             if (snapshot.hasError) {
@@ -154,21 +157,21 @@ class UserDocumentsWidget extends StatelessWidget {
             }
 
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return Center(child: Text('No images found.'));
+              return const Center(child: Text('No images found.'));
             }
 
             final documents = snapshot.data!.docs;
 
             return GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 crossAxisSpacing: 10.0,
                 mainAxisSpacing: 10.0,
                 childAspectRatio: 1.0,
               ),
               itemCount: documents.length,
-              shrinkWrap: true, // Important for nesting GridView in ListView
-              physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
                 final imageUrl = documents[index]['imageUrl'];
                 final imageName = documents[index].id;
@@ -196,7 +199,7 @@ class UserDocumentsWidget extends StatelessWidget {
                             imageUrl,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
-                              return Center(
+                              return const Center(
                                   child: Text('Failed to load image.'));
                             },
                           ),
@@ -206,7 +209,7 @@ class UserDocumentsWidget extends StatelessWidget {
                           child: Text(
                             imageName,
                             textAlign: TextAlign.center,
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
@@ -217,7 +220,7 @@ class UserDocumentsWidget extends StatelessWidget {
             );
           },
         ),
-        Divider(thickness: 2),
+        const Divider(thickness: 2),
       ],
     );
   }
@@ -226,13 +229,13 @@ class UserDocumentsWidget extends StatelessWidget {
 class FullScreenImage extends StatelessWidget {
   final String imageUrl;
 
-  FullScreenImage({required this.imageUrl});
+  const FullScreenImage({super.key, required this.imageUrl});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Document View'),
+        title: const Text('Document View'),
         backgroundColor: Theme.of(context).primaryColor,
       ),
       body: Center(

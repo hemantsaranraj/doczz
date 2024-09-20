@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:doczz/features/home/admin/admin_dashboard.dart'; // Admin dashboard screen
+import 'package:doczz/features/home/admin/admin_dashboard.dart';
 
 class AdminLoginPage extends StatefulWidget {
-  const AdminLoginPage({Key? key}) : super(key: key);
+  const AdminLoginPage({super.key});
 
   @override
   _AdminLoginPageState createState() => _AdminLoginPageState();
@@ -35,17 +35,14 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
           .collection('Users')
           .doc(userCredential.user?.email)
           .get();
-      // print("User Document: ${userDoc.data()}");
 
       if (userDoc.exists) {
-        // Cast the document data to a Map<String, dynamic>
-        // Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
-
         if (userDoc['isAdmin'] == "true") {
           // Navigate to the admin dashboard
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-              builder: (context) => AdminDashboard(), // Your admin dashboard
+              builder: (context) =>
+                  const AdminDashboard(), // Your admin dashboard
             ),
           );
         } else {
@@ -75,7 +72,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: Text('OK'),
+            child: const Text('OK'),
           ),
         ],
       ),
@@ -97,9 +94,9 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Icon(Icons.admin_panel_settings, size: 100, color: textColor),
-              SizedBox(height: 80),
+              const SizedBox(height: 80),
               TextField(
                 controller: _emailController,
                 decoration: InputDecoration(
@@ -111,7 +108,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                 style: TextStyle(color: textColor),
                 keyboardType: TextInputType.emailAddress,
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               TextField(
                 controller: _passwordController,
                 obscureText: _obscurePassword,
@@ -131,13 +128,13 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                 ),
                 style: TextStyle(color: textColor),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _adminLogin,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.transparent,
                   elevation: 0,
-                  minimumSize: Size(double.infinity, 48),
+                  minimumSize: const Size(double.infinity, 48),
                 ),
                 child: Text('Admin Login',
                     style: Theme.of(context).textTheme.headlineLarge?.copyWith(

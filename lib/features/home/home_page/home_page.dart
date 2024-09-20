@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:doczz/features/home/home_page/number_plate_widget.dart'; // Import the custom NumberPlate widget
 
 class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
   Future<Map<String, String>> _getUserDetails() async {
     final User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -54,17 +56,17 @@ class HomePage extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
             appBar: AppBar(
-              title: Text('Loading...'),
+              title: const Text('Loading...'),
               backgroundColor: Theme.of(context).primaryColor,
             ),
-            body: Center(child: CircularProgressIndicator()),
+            body: const Center(child: CircularProgressIndicator()),
           );
         }
 
         if (snapshot.hasError) {
           return Scaffold(
             appBar: AppBar(
-              title: Text('Error'),
+              title: const Text('Error'),
               backgroundColor: Theme.of(context).primaryColor,
             ),
             body: Center(child: Text('Error: ${snapshot.error}')),
@@ -95,11 +97,11 @@ class HomePage extends StatelessWidget {
                     NumberPlate(
                       vehicleNumber: userDetails['vehicleNumber'] ?? 'Unknown',
                     ),
-                    SizedBox(height: 30.0),
+                    const SizedBox(height: 30.0),
                     Text(
                       'Vehicle type: ${userDetails['vehicleType'] ?? 'Unknown'}',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -113,7 +115,7 @@ class HomePage extends StatelessWidget {
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
+                      return const Center(child: CircularProgressIndicator());
                     }
 
                     if (snapshot.hasError) {
@@ -121,9 +123,9 @@ class HomePage extends StatelessWidget {
                     }
 
                     if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                      return Center(
+                      return const Center(
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                          padding: EdgeInsets.symmetric(horizontal: 20.0),
                           child: Text(
                             'Kindly upload your details in the documents page',
                             textAlign: TextAlign.center,
@@ -137,7 +139,8 @@ class HomePage extends StatelessWidget {
                     final documents = snapshot.data!.docs;
 
                     return GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         crossAxisSpacing: 10.0,
                         mainAxisSpacing: 10.0,
@@ -171,7 +174,7 @@ class HomePage extends StatelessWidget {
                                     imageUrl,
                                     fit: BoxFit.cover,
                                     errorBuilder: (context, error, stackTrace) {
-                                      return Center(
+                                      return const Center(
                                           child: Text('Failed to load image.'));
                                     },
                                   ),
@@ -181,8 +184,8 @@ class HomePage extends StatelessWidget {
                                   child: Text(
                                     imageName,
                                     textAlign: TextAlign.center,
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ],
@@ -205,13 +208,13 @@ class HomePage extends StatelessWidget {
 class FullScreenImage extends StatelessWidget {
   final String imageUrl;
 
-  FullScreenImage({required this.imageUrl});
+  const FullScreenImage({super.key, required this.imageUrl});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Document View'),
+        title: const Text('Document View'),
         backgroundColor: Theme.of(context).primaryColor,
       ),
       body: Center(

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:doczz/features/welcome_page/welcome_screen.dart'; // Correct import
-import 'package:doczz/features/auth/register_page.dart'; // Correct import
-import 'package:doczz/features/auth/admin_login_page.dart'; // Add this import
+import 'package:doczz/features/welcome_page/welcome_screen.dart';
+import 'package:doczz/features/auth/register_page.dart';
+import 'package:doczz/features/auth/admin_login_page.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -43,22 +43,20 @@ class _LoginPageState extends State<LoginPage> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Icon(Icons.error, color: Colors.red, size: 60),
+          title: const Icon(Icons.error, color: Colors.red, size: 60),
           content: Text(e.toString()),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         ),
       );
     }
   }
-
-  // Building the UI
 
   @override
   Widget build(BuildContext context) {
@@ -75,9 +73,9 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Icon(Icons.person, size: 100, color: textColor),
-              SizedBox(height: 80),
+              const SizedBox(height: 80),
               TextField(
                 controller: _emailController,
                 decoration: InputDecoration(
@@ -89,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
                 style: TextStyle(color: textColor),
                 keyboardType: TextInputType.emailAddress,
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               TextField(
                 controller: _passwordController,
                 obscureText: _obscurePassword,
@@ -109,7 +107,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 style: TextStyle(color: textColor),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
@@ -120,19 +118,19 @@ class _LoginPageState extends State<LoginPage> {
                       style: TextStyle(color: textColor)),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _login,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.transparent,
                   elevation: 0,
-                  minimumSize: Size(double.infinity, 48),
+                  minimumSize: const Size(double.infinity, 48),
                 ),
                 child: Text('Login',
                     style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                         fontWeight: FontWeight.bold, color: textColor)),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               TextButton(
                 onPressed: () {
                   Navigator.of(context).push(
@@ -156,7 +154,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 20), // Add spacing before the admin login button
+              const SizedBox(height: 20),
               TextButton(
                 onPressed: () {
                   Navigator.of(context).push(
@@ -165,7 +163,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   );
                 },
-                child: Text('Admin Login', // Add the admin login option
+                child: Text('Admin Login',
                     style: TextStyle(
                         color: textColor, fontWeight: FontWeight.bold)),
               ),

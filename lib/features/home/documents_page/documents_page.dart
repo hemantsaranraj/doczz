@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class DocumentsPage extends StatefulWidget {
+  const DocumentsPage({super.key});
+
   @override
   _DocumentsPageState createState() => _DocumentsPageState();
 }
@@ -18,9 +20,10 @@ class _DocumentsPageState extends State<DocumentsPage> {
   bool _isUploading = false;
   String? _selectedImageName;
 
-  TextEditingController _vehicleNumberController = TextEditingController();
+  final TextEditingController _vehicleNumberController =
+      TextEditingController();
   String? _selectedVehicleType;
-  bool _isEditingVehicleInfo = false; // Changed to false
+  bool _isEditingVehicleInfo = false;
 
   @override
   void initState() {
@@ -45,7 +48,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
               vehicleNumber ?? 'null'; // Set to "null" if not present
           _selectedVehicleType =
               vehicleType ?? 'null'; // Set to "null" if not present
-          _isEditingVehicleInfo = false; // Show the Edit mode
+          _isEditingVehicleInfo = false;
         });
       } else {
         setState(() {
@@ -60,30 +63,30 @@ class _DocumentsPageState extends State<DocumentsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Select Document'),
+          title: const Text('Select Document'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Text('Driving Licence'),
+                title: const Text('Driving Licence'),
                 onTap: () {
                   Navigator.of(context).pop('Driving Licence');
                 },
               ),
               ListTile(
-                title: Text('Registration Certificate'),
+                title: const Text('Registration Certificate'),
                 onTap: () {
                   Navigator.of(context).pop('Registration Certificate');
                 },
               ),
               ListTile(
-                title: Text('Insurance'),
+                title: const Text('Insurance'),
                 onTap: () {
                   Navigator.of(context).pop('Insurance');
                 },
               ),
               ListTile(
-                title: Text('Pollution Certificate'),
+                title: const Text('Pollution Certificate'),
                 onTap: () {
                   Navigator.of(context).pop('Pollution Certificate');
                 },
@@ -108,18 +111,18 @@ class _DocumentsPageState extends State<DocumentsPage> {
       barrierDismissible: false, // User must tap a button to dismiss
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirm Upload'),
+          title: const Text('Confirm Upload'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               if (_imageFile != null) ...[
-                Icon(
+                const Icon(
                   Icons.check_circle,
                   color: Colors.green,
                   size: 80,
                 ),
-                SizedBox(height: 20),
-                Text(
+                const SizedBox(height: 20),
+                const Text(
                   'Do you want to upload this document?',
                   textAlign: TextAlign.center,
                 ),
@@ -128,7 +131,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -136,13 +139,13 @@ class _DocumentsPageState extends State<DocumentsPage> {
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
-                _uploadImage(); // Trigger the upload
+                _uploadImage();
               },
               child: _isUploading
-                  ? CircularProgressIndicator(
+                  ? const CircularProgressIndicator(
                       color: Colors.white,
                     )
-                  : Text('Upload Document'),
+                  : const Text('Upload Document'),
             ),
           ],
         );
@@ -154,7 +157,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
     _user = FirebaseAuth.instance.currentUser;
     if (_user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('User is not authenticated')),
+        const SnackBar(content: Text('User is not authenticated')),
       );
       return;
     }
@@ -202,14 +205,14 @@ class _DocumentsPageState extends State<DocumentsPage> {
     _user = FirebaseAuth.instance.currentUser;
     if (_user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('User is not authenticated')),
+        const SnackBar(content: Text('User is not authenticated')),
       );
       return;
     }
 
     if (_selectedImageName == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please select an image name')),
+        const SnackBar(content: Text('Please select an image name')),
       );
       return;
     }
@@ -236,7 +239,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
             .set({'imageUrl': downloadURL});
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Document uploaded successfully')),
+          const SnackBar(content: Text('Document uploaded successfully')),
         );
 
         setState(() {
@@ -255,7 +258,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please select an image')),
+        const SnackBar(content: Text('Please select an image')),
       );
     }
   }
@@ -264,14 +267,15 @@ class _DocumentsPageState extends State<DocumentsPage> {
     _user = FirebaseAuth.instance.currentUser;
     if (_user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('User is not authenticated')),
+        const SnackBar(content: Text('User is not authenticated')),
       );
       return;
     }
 
     if (_vehicleNumberController.text.isEmpty || _selectedVehicleType == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please enter vehicle number and select type')),
+        const SnackBar(
+            content: Text('Please enter vehicle number and select type')),
       );
       return;
     }
@@ -287,7 +291,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Vehicle information saved successfully')),
+        const SnackBar(content: Text('Vehicle information saved successfully')),
       );
     } catch (e) {
       print('Save Error: $e');
@@ -307,7 +311,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Documents'),
+        title: const Text('Documents'),
         backgroundColor: Theme.of(context).primaryColor,
       ),
       body: Padding(
@@ -318,7 +322,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
             children: <Widget>[
               // Vehicle Info Editing Section
               if (_isEditingVehicleInfo) ...[
-                Container(
+                SizedBox(
                   width: double.infinity,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -333,13 +337,13 @@ class _DocumentsPageState extends State<DocumentsPage> {
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
                         value: _selectedVehicleType,
                         items: ['Bike', 'Car', 'Truck', 'Van', 'Bus']
                             .map((type) => DropdownMenuItem(
-                                  child: Text(type),
                                   value: type,
+                                  child: Text(type),
                                 ))
                             .toList(),
                         onChanged: (value) {
@@ -355,20 +359,20 @@ class _DocumentsPageState extends State<DocumentsPage> {
                         ),
                         isExpanded: true,
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: _saveVehicleInfo,
-                        child: Text('Save'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Theme.of(context).primaryColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                             horizontal: 32,
                             vertical: 12,
                           ),
                         ),
+                        child: const Text('Save'),
                       ),
                     ],
                   ),
@@ -384,20 +388,20 @@ class _DocumentsPageState extends State<DocumentsPage> {
                       textAlign: TextAlign.center,
                     ),
                     IconButton(
-                      icon: Icon(Icons.edit),
+                      icon: const Icon(Icons.edit),
                       onPressed: _editVehicleInfo,
                     ),
                   ],
                 ),
               ],
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               // Document Picker Button
               ElevatedButton(
                 onPressed: _showImageSelector,
-                child: Text('Select a Document to upload'),
+                child: const Text('Select a Document to upload'),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               // Document List Section
               StreamBuilder(
@@ -408,7 +412,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
-                    return Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   }
 
                   var documents = snapshot.data!.docs;
@@ -419,7 +423,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                         Column(
                           children: [
                             Container(
-                              padding: EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(8.0),
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.grey),
                                 borderRadius: BorderRadius.circular(8.0),
@@ -430,13 +434,14 @@ class _DocumentsPageState extends State<DocumentsPage> {
                                 children: [
                                   Text(doc.id),
                                   IconButton(
-                                    icon: Icon(Icons.delete, color: Colors.red),
+                                    icon: const Icon(Icons.delete,
+                                        color: Colors.red),
                                     onPressed: () => _deleteImage(doc.id),
                                   ),
                                 ],
                               ),
                             ),
-                            SizedBox(height: 10),
+                            const SizedBox(height: 10),
                           ],
                         ),
                     ],
